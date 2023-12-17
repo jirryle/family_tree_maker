@@ -26,15 +26,16 @@ function init() {
                 { row: 0, font: "bold 16px sans-serif" })
             // add additional text blocks for legend here
         ));
-
     // create the model for the family tree
-    myDiagram.model = new go.TreeModel([
-        // define the tree's node data
-        { key: 1, name: "Person 1" },
-        { key: 2, parent: 1, name: "Person 2" },
-        { key: 3, parent: 1, name: "Person 3" }
-        // and so on for more family members
-    ]);
+    fetchFamilyTreeData(myDiagram);
+}
+function fetchFamilyTreeData(myDiagram) {
+    fetch('/family-tree-data')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            myDiagram.model = new go.TreeModel(data);
+        });
 }
 
 // start everything once the DOM is loaded

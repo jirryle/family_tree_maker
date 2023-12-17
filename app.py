@@ -14,6 +14,12 @@ def add_relative():
     database.add_relative(data)
     return jsonify(success=True)
 
+@app.route('/get_family_trees')
+def get_family_trees():
+    people = database.fetch_all_people()
+    family_tree_roots = database.build_trees(people)
+    return jsonify([database.serialize_tree(root) for root in family_tree_roots])
+
 if __name__ == '__main__':
     database.setup()
     app.run(debug=True)

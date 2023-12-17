@@ -1,5 +1,5 @@
 import sqlite3
-
+from app import app
 from flask import app, jsonify
 
 DATABASE_NAME = "family_tree.db"
@@ -82,8 +82,3 @@ def serialize_tree(person):
 def serialize_trees(roots):
     return [serialize_tree(root) for root in roots]
 
-@app.route('/get_family_trees')
-def get_family_trees():
-    people = database.fetch_all_people()
-    family_tree_roots = build_trees(people)
-    return jsonify([serialize_tree(root) for root in family_tree_roots])

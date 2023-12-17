@@ -1,20 +1,17 @@
 <!DOCTYPE html>
-<script src="https://unpkg.com/gojs/release/go.js"></script>
 <html>
 <head>
     <title>Family Tree Maker</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Include GoJS Library -->
+    <script src="https://unpkg.com/gojs/release/go.js"></script>
 </head>
 <body>
-    <div id="family-tree">
-        <div id="me">Me</div>
-    </div>
+    <div id="family-tree-container" style="width: 800px; height: 600px; border: 1px solid black;"></div>
     <div id="sidebar">
-        <form id="relative-form">
-            <!-- Add form fields for name, gender, birth date, photo, etc. -->
-            <button type="submit">Add Relative</button>
-        </form>
+        <!-- Sidebar content (like forms for adding relatives) -->
     </div>
+    <!-- Reference to your custom script -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
