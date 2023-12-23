@@ -7,15 +7,37 @@
     <script src="https://unpkg.com/gojs/release/go.js"></script>
 </head>
 <body>
-    <form id = "relative-form">
-        <input type = "text" id = "name" placeholder = "Name" required>
-        <input type = "text" id = "gender" placeholder = "Gender" required>
-        <input type = "text" id = "birth_date" placeholder = "Birth Date" required>
-        <input type = "text" id = "photo_url" placeholder = "Photo URL" required>
-        <input type = "text" id = "father_id" placeholder = "Father ID" required>
-        <input type = "text" id = "mother_id" placeholder = "Mother ID" required>
-        <button type = "submit">Add Relative</button>
-    </form>
+    <div id="add-relative-form" style="display:none;">
+        <h3>Add Relative</h3>
+        <form>
+            <input type="hidden" id="node-id">
+            <div>
+                <label>Relationship:</label>
+                <button type="button" onclick="setRelationship('Father')">Father</button>
+                <button type="button" onclick="setRelationship('Mother')">Mother</button>
+                <button type="button" onclick="setRelationship('Child')">Child</button>
+            </div>
+            <div>
+                <label>Name:</label>
+                <input type="text" id="relative-name">
+            </div>
+            <div>
+                <label>Gender:</label>
+                <input type="text" id="relative-gender">
+            </div>
+            <div>
+                <label>Birth Date:</label>
+                <input type="date" id="relative-birth-date">
+            </div>
+            <div>
+                <label>Photo URL:</label>
+                <input type="text" id="relative-photo-url">
+            </div>
+            <input type="hidden" id="relationship">
+            <button type="submit">Add Relative</button>
+            <button type="button" onclick="closeForm()">Cancel</button>
+        </form>
+    </div>
     <div id="family-tree-container" style="width: 800px; height: 600px; border: 1px solid black;"></div>
     <div id="sidebar">
         <!-- Sidebar content (like forms for adding relatives) -->

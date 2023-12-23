@@ -20,18 +20,58 @@ def setup():
             FOREIGN KEY (mother_id) REFERENCES relatives (id)
         )
     ''')
+    # Check if the initial node has been created 
+    cursor.execute('SELECT id FROM relatives')
+    if cursor.fetchone() is None:
+        # Insert the initial node
+        cursor.execute('''
+                INSERT INTO relatives (name, gender, birth_date, photo_url, father_id, mother_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+                    ''', ("Me", "Gender", "Birth Date", "Photo URL", None, None))
     conn.commit()
     conn.close()
 
-def add_relative(data):
+def add_father(node_id, name, gender, birth_date, photo_url):
     conn = sqlite3.connect(DATABASE_NAME)
     cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO relatives (name, gender, birth_date, photo_url, father_id, mother_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (data['name'], data['gender'], data['birth_date'], data['photo_url'], data['father_id'], data['mother_id']))
-    conn.commit()
-    conn.close()
+    try:
+        # Step 1: Check if the child already has a father_id set
+        cursor.execute('SELECT father_id FROM relatives WHERE id = ?', (node_id,))
+        existing_father_id = cursor.fetchone()
+
+        if existing_father_id and existing_father_id[0]:
+            # Handle the case where a father already exists (e.g., return an error or update the existing father)
+            cursor.execute('''
+            UPDATE relatives
+            SET name = ?, gender = ?, birth_date = ?, photo_url = ?
+            WHERE id = ?
+        ''', (name, gender, birth_date, photo_url, existing_father_id))
+
+        # Step 2: Insert the new father node
+        cursor.execute('''
+            INSERT INTO relatives (name, gender, birth_date, photo_url)
+            VALUES (?, ?, ?, ?)
+        ''', (name, gender, birth_date, photo_url))
+
+        # Get the ID of the newly inserted father
+        new_father_id = cursor.lastrowid
+
+        # Step 3: Update the child's father_id to reference the new father's ID
+        cursor.execute('''
+            UPDATE relatives
+            SET father_id = ?
+            WHERE id = ?
+        ''', (new_father_id, node_id))
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+        return f"Failed to add father: {e}"
+    finally:
+        conn.close()
+
+    return "Father added successfully"
+
 
 class Person:
     def __init__(self, id, name, gender, birth_date, photo_url, father_id=None, mother_id=None):
