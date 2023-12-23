@@ -9,10 +9,15 @@ def index():
 
 @app.route('/add_relative', methods=['POST'])
 def add_relative():
-    data = request.form
-    # You should process and store the data in the database
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    #Validate that all required fields are present
+    required_fields = ['name', 'gender', 'birth_date', 'photo_url', 'father_id', 'mother_id']
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing fields"}), 400
     database.add_relative(data)
-    return jsonify(success=True)
+    return jsonify("Relative added successfully")
 
 @app.route('/get_family_trees')
 def get_family_trees():
