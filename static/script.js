@@ -1,32 +1,41 @@
+let myDiagram = null;
 function init() {
     const $ = go.GraphObject.make;  // for conciseness in defining templates
 
-    const myDiagram = $(go.Diagram, "family-tree-container",  // must name or refer to the DIV HTML element
+    myDiagram = $(go.Diagram, "family-tree-container",  // must name or refer to the DIV HTML element
         {
-            // configure the diagram layout
-            layout: $(go.TreeLayout, { angle: 90, layerSpacing: 35 }),
+            // Instead of TreeLayout, use ForceDirectedLayout for GraphLinksModel, which works better with multiple parent nodes
+            layout: $(go.ForceDirectedLayout),
         });
 
     // Define a simple node template
     myDiagram.nodeTemplate =
-    $(go.Node, "Spot",  // Use Spot Panel for more control over positioning
-        // define the node's outer shape, which will surround the TextBlock
-        $(go.Shape, "Rectangle", 
-            { fill: "lightblue", stroke: null, width: 100, height: 40 }), // Specify shape size
-        $(go.TextBlock,
-            { 
-              alignment: go.Spot.Center, // Center the text
-              stroke: "black", 
-              font: "bold 14px sans-serif" 
-            },
-            new go.Binding("text", "name"))
-    );
+        $(go.Node, "Auto",  // Changed from "Spot" to "Auto" for automatic sizing
+            $(go.Shape, "Rectangle",  // This defines the node's outer shape
+                { fill: "lightblue", stroke: "gray", strokeWidth: 2 }),
+            $(go.TextBlock,  // This defines the text inside the node
+                {
+                    margin: 10, stroke: "black", font: "bold 14px sans-serif",
+                    alignment: go.Spot.Center  // Center the text in the node
+                },
+                new go.Binding("text", "name"))  // Bind the TextBlock to the node data's "name" property
+        );
+
+    // Define a simple link template
+    myDiagram.linkTemplate =
+        $(go.Link,  // Define how links are drawn
+            { routing: go.Link.Orthogonal, corner: 5 },
+            $(go.Shape,  // This represents the link shape
+                { strokeWidth: 2, stroke: "#555" }),
+            $(go.Shape,  // This represents the arrowhead at the end of the link
+                { toArrow: "Standard", stroke: null, fill: "#555" })
+        );
 
     // Define what happens when a node is clicked
-    myDiagram.nodeTemplate.click = function(e, obj) {
+    myDiagram.nodeTemplate.click = function (e, obj) {
         const clickedNode = obj.part.data;
         // Show form for adding relatives
-        showAddRelativeForm(clickedNode.key);
+        showAddRelativeForm(clickedNode.key);  // Changed from id to key, which is used in GraphLinksModel
     };
 
     // Set up a Part as a legend, and place it directly on the diagram
@@ -80,8 +89,6 @@ document.getElementById('add-relative-form').addEventListener('submit', function
         photo_url: photoUrl,
         relationship: relationship,
     };
-
-    // ERROR starts here
     // Send the data to the server
     fetch(`/add_relative/${nodeId}`, {
         method: 'POST',
@@ -92,7 +99,7 @@ document.getElementById('add-relative-form').addEventListener('submit', function
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data.message);
+        console.log("data message is ", data.message);
         // Refresh the diagram to show the new relative
         fetchFamilyTreeData(myDiagram);
     })
@@ -103,12 +110,35 @@ document.getElementById('add-relative-form').addEventListener('submit', function
     closeForm();
 });
 
+//called by init(), initializes the GoJS diagram
 function fetchFamilyTreeData(myDiagram) {
     fetch('/get_family_trees')
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            myDiagram.model = new go.TreeModel(data);
+            // Transform data to include nodes and link data for GraphLinksModel
+            const nodeDataArray = data.map(node => ({
+                key: node.id,
+                name: node.name,
+                gender: node.gender,
+                birthDate: node.birth_date,
+                photoUrl: node.photo_url
+            }));
+
+            const linkDataArray = data.flatMap(node => {
+                const links = [];
+                if (node.father_id !== null) {
+                    links.push({ from: node.father_id, to: node.id });
+                }
+                if (node.mother_id !== null) {
+                    links.push({ from: node.mother_id, to: node.id });
+                }
+                return links;
+            });
+
+            console.log("node data is ", nodeDataArray);
+            console.log("link data is ", linkDataArray);
+
+            myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
         });
 }
 // start everything once the DOM is loaded

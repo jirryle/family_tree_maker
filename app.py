@@ -10,7 +10,8 @@ def index():
 @app.route('/add_relative/<node_id>', methods=['POST'])
 def add_relative(node_id):
     data = request.get_json()
-
+    print("data from app.route is ", data)
+    print("node id for child is ", node_id)
     if not data or 'relationship' not in data:
         return jsonify({"error": "Missing necessary data"}), 400
 
@@ -18,12 +19,13 @@ def add_relative(node_id):
         # Common data extraction
         name = data['name']
         gender = data['gender']
-        birthDate = data['birthDate']
-        photoUrl = data['photoUrl']
+        birthDate = data['birth_date']
+        photoUrl = data['photo_url']
         relationship = data['relationship']
 
         # Call different functions based on relationship type
         if relationship == 'Father':
+            print("success")
             database.add_father(node_id, name, gender, birthDate, photoUrl)
         elif relationship == 'Mother':
             database.add_mother(node_id, name, gender, birthDate, photoUrl)
