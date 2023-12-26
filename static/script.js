@@ -37,15 +37,6 @@ function init() {
         // Show form for adding relatives
         showAddRelativeForm(clickedNode.key);  // Changed from id to key, which is used in GraphLinksModel
     };
-
-    // Set up a Part as a legend, and place it directly on the diagram
-    myDiagram.add(
-        $(go.Part, "Table",
-            { position: new go.Point(300, 10), selectable: false },
-            $(go.TextBlock, "Legend",
-                { row: 0, font: "bold 16px sans-serif" })
-            // add additional text blocks for legend here
-        ));
     // create the model for the family tree
     fetchFamilyTreeData(myDiagram);
 }

@@ -92,22 +92,9 @@ def fetch_all_people():
     conn.close()
     return [Person(*data) for data in people_data]
 
-def build_trees(people):
-    people_dict = {person.id: person for person in people}
-    roots = [person for person in people if person.father_id is None and person.mother_id is None]
-
-    for person in people:
-        if person.father_id:
-            father = people_dict.get(person.father_id)
-            if father:
-                father.children.append(person)
-        if person.mother_id:
-            mother = people_dict.get(person.mother_id)
-            if mother:
-                mother.children.append(person)
-    return roots
-
 def serialize_tree(person):
+    # Check if the person has an 'children' attribute
+    children = getattr(person, 'children', None)
     return {
         "id": person.id,
         "name": person.name,
@@ -116,9 +103,7 @@ def serialize_tree(person):
         "photo_url": person.photo_url,
         "father_id": person.father_id,
         "mother_id": person.mother_id,
-        "children": [serialize_tree(child) for child in person.children] 
+        # Use a list comprehension to serialize children if they exist
+        "children": [serialize_tree(child) for child in children] if children else [] 
     }
-
-def serialize_trees(roots):
-    return [serialize_tree(root) for root in roots]
 
