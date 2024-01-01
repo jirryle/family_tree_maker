@@ -38,30 +38,29 @@ def add_father(node_id, name, gender, birth_date, photo_url):
         # Step 1: Check if the child already has a father_id set
         cursor.execute('SELECT father_id FROM relatives WHERE id = ?', (node_id,))
         existing_father_id = cursor.fetchone()
-
         if existing_father_id and existing_father_id[0]:
             # Handle the case where a father already exists (e.g., return an error or update the existing father)
             cursor.execute('''
             UPDATE relatives
             SET name = ?, gender = ?, birth_date = ?, photo_url = ?
             WHERE id = ?
-        ''', (name, gender, birth_date, photo_url, existing_father_id))
+        ''', (name, gender, birth_date, photo_url, existing_father_id[0]))
+        else:
+            # Step 2: Insert the new father node
+            cursor.execute('''
+                INSERT INTO relatives (name, gender, birth_date, photo_url)
+                VALUES (?, ?, ?, ?)
+            ''', (name, gender, birth_date, photo_url))
 
-        # Step 2: Insert the new father node
-        cursor.execute('''
-            INSERT INTO relatives (name, gender, birth_date, photo_url)
-            VALUES (?, ?, ?, ?)
-        ''', (name, gender, birth_date, photo_url))
+            # Get the ID of the newly inserted father
+            new_father_id = cursor.lastrowid
 
-        # Get the ID of the newly inserted father
-        new_father_id = cursor.lastrowid
-
-        # Step 3: Update the child's father_id to reference the new father's ID
-        cursor.execute('''
-            UPDATE relatives
-            SET father_id = ?
-            WHERE id = ?
-        ''', (new_father_id, node_id))
+            # Step 3: Update the child's father_id to reference the new father's ID
+            cursor.execute('''
+                UPDATE relatives
+                SET father_id = ?
+                WHERE id = ?
+            ''', (new_father_id, node_id))
 
         conn.commit()
     except sqlite3.Error as e:
@@ -72,6 +71,45 @@ def add_father(node_id, name, gender, birth_date, photo_url):
 
     return "Father added successfully"
 
+def add_mother(node_id, name, gender, birth_date, photo_url):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    try:
+        # Step 1: Check if the child already has a mother_id set
+        cursor.execute('SELECT mother_id FROM relatives WHERE id = ?', (node_id,))
+        existing_mother_id = cursor.fetchone()
+        if existing_mother_id and existing_mother_id[0]:
+            # Handle the case where a mother already exists (e.g., return an error or update the existing mother)
+            cursor.execute('''
+            UPDATE relatives
+            SET name = ?, gender = ?, birth_date = ?, photo_url = ?
+            WHERE id = ?
+        ''', (name, gender, birth_date, photo_url, existing_mother_id[0]))
+        else:
+            # Step 2: Insert the new mother node
+            cursor.execute('''
+                INSERT INTO relatives (name, gender, birth_date, photo_url)
+                VALUES (?, ?, ?, ?)
+            ''', (name, gender, birth_date, photo_url))
+
+            # Get the ID of the newly inserted mother
+            new_mother_id = cursor.lastrowid
+
+            # Step 3: Update the child's mother_id to reference the new mother's ID
+            cursor.execute('''
+                UPDATE relatives
+                SET mother_id = ?
+                WHERE id = ?
+            ''', (new_mother_id, node_id))
+
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+        return f"Failed to add mother: {e}"
+    finally:
+        conn.close()
+
+    return "Mother added successfully"
 
 class Person:
     def __init__(self, id, name, gender, birth_date, photo_url, father_id=None, mother_id=None):
@@ -83,6 +121,19 @@ class Person:
         self.father_id = father_id
         self.mother_id = mother_id
         self.children = []
+
+def fetch_node_details(nodeId):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    cursor.execute('SELECT name, gender, birth_date, photo_url FROM relatives WHERE id = ?', (nodeId))
+    node_details = cursor.fetchall()[0]
+    conn.close()
+    return {
+        "name" : node_details[0],
+        "gender" : node_details[1],
+        "birth_date" : node_details[2],
+        "photo_url" : node_details[3]
+    }
 
 def fetch_all_people():
     conn = sqlite3.connect(DATABASE_NAME)

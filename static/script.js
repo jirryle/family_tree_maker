@@ -4,8 +4,8 @@ function init() {
 
     myDiagram = $(go.Diagram, "family-tree-container",  // must name or refer to the DIV HTML element
         {
-            // Instead of TreeLayout, use ForceDirectedLayout for GraphLinksModel, which works better with multiple parent nodes
-            layout: $(go.ForceDirectedLayout),
+            layout: $(go.LayeredDigraphLayout,  // use a LayeredDigraphLayout
+                { direction: 90, columnSpacing: 30, setsPortSpots: false }),
         });
 
     // Define a simple node template
@@ -23,28 +23,100 @@ function init() {
 
     // Define a simple link template
     myDiagram.linkTemplate =
-        $(go.Link,  // Define how links are drawn
-            { routing: go.Link.Orthogonal, corner: 5 },
-            $(go.Shape,  // This represents the link shape
-                { strokeWidth: 2, stroke: "#555" }),
-            $(go.Shape,  // This represents the arrowhead at the end of the link
-                { toArrow: "Standard", stroke: null, fill: "#555" })
-        );
+    $(go.Link,  // Define how links are drawn
+        { routing: go.Link.Orthogonal, corner: 5 },
+        $(go.Shape,  // This represents the link shape
+            { strokeWidth: 2, stroke: "#555" }),
+        $(go.Shape,  // This represents the arrowhead at the end of the link
+            { toArrow: "Standard", stroke: null, fill: "#555" })
+    );
 
     // Define what happens when a node is clicked
     myDiagram.nodeTemplate.click = function (e, obj) {
+        hideCurrNodeDetails();
         const clickedNode = obj.part.data;
-        // Show form for adding relatives
-        showAddRelativeForm(clickedNode.key);  // Changed from id to key, which is used in GraphLinksModel
+        // Show node details
+        fetchNodeDetails(clickedNode.key);
     };
     // create the model for the family tree
     fetchFamilyTreeData(myDiagram);
 }
 
+function fetchNodeDetails(nodeId) {
+    fetch(`/get_node_details/${nodeId}`, {
+        method: 'GET',
+    })
+    .then (response => {
+        console.log(response);
+        if (!response.ok) {
+            throw new Error("Network response was not ok: ", response.statusText);
+        }
+        return response.json(); // Parses the JSON in the response
+    })
+    .then (data => {
+        // Handle data from server
+        displayNodeDetails(nodeId, data);
+    })
+    .catch(error => {
+        console.error('There is a problem with the fetch operation: ', error);
+    })
+}
+
+function displayNodeDetails(nodeId, data) {
+    const nodeDetails = document.getElementById('node-details');
+    const sidebarInstructions = document.getElementById('sidebar-instructions');
+    sidebarInstructions.style.display = 'none';
+    nodeDetails.style.display = '';
+    nodeDetails.innerHTML = "";
+    if (data && Object.keys(data).length > 0) {
+        const content = `
+            <img src="${data.photo_url || 'https://placekitten.com/200/300'}" style="max-width: 300px; max-height: 200px; width: auto;
+            height: auto;" onerror="this.onerror=null;this.src='https://placekitten.com/200/300';">
+            <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+            <p><strong>Gender:</strong> ${data.gender || 'N/A'}</p>
+            <p><strong>Birth Date:</strong> ${data.birth_date || 'N/A'}</p>
+            <p><strong>Photo URL:</strong> ${data.photo_url ? `<a href="${data.photo_url}" target="_blank">View Photo</a>` : 'N/A'}</p>
+            <button onclick='showEditPersonForm("${nodeId}")'>Edit this person</button>
+            <button onclick='showAddRelativeForm("${nodeId}")'>Add a relative</button>
+            <button onclick='resetToInstructions()'>Cancel</button>
+        `;
+        nodeDetails.innerHTML = content;
+    } else {
+        nodeDetails.innerHTML = '<p> No details available </p>';
+    }
+}
+
+function showEditPersonForm() {
+    const form = document.getElementById('edit-person-form');
+    form.style.display = 'block';
+    const relativeForm = document.getElementById('add-relative-form');
+    relativeForm.style.display = 'none';
+}
+function resetToInstructions() {
+    const nodeDetails = document.getElementById('node-details');
+    const sidebarInstructions = document.getElementById('sidebar-instructions');
+    const relativeForm = document.getElementById('add-relative-form');
+    const editPersonForm = document.getElementById('edit-person-form');
+    sidebarInstructions.style.display = '';
+    nodeDetails.style.display = 'none';
+    editPersonForm.style.display = 'none';
+    relativeForm.style.display = 'none';
+}
+function hideCurrNodeDetails() {
+    const nodeDetails = document.getElementById('node-details');
+    const relativeForm = document.getElementById('add-relative-form');
+    const editPersonForm = document.getElementById('edit-person-form');
+    nodeDetails.style.display = 'none';
+    editPersonForm.style.display = 'none';
+    relativeForm.style.display = 'none';
+}
+
 // Show the form for adding relatives to a specific node
 function showAddRelativeForm(nodeId) {
-    // Assuming you have a form in your HTML with id="relative-form"
+    // Gets form in HTML with id="relative-form"
     const form = document.getElementById('add-relative-form');
+    const editPersonForm = document.getElementById('edit-person-form'); // Hide edit person form
+    editPersonForm.style.display = 'none';
     form.style.display = 'block'; // Show the form
 
     // Set the nodeId in a hidden input so you know which node is being added to
@@ -56,7 +128,11 @@ function setRelationship(relationship) {
     document.getElementById('relationship').value = relationship;
 }
 
-function closeForm() {
+function closeEditNodeForm() {
+    document.getElementById('edit-person-form').style.display = 'none';
+}
+
+function closeRelativeForm() {
     // Hide the form without submitting
     document.getElementById('add-relative-form').style.display = 'none';
 }
@@ -66,6 +142,7 @@ document.getElementById('add-relative-form').addEventListener('submit', function
     event.preventDefault();
 
     const nodeId = document.getElementById('node-id').value;
+    console.log("nodeId for submit is ", nodeId);
     const name = document.getElementById('relative-name').value;
     const gender = document.getElementById('relative-gender').value;
     const birthDate = document.getElementById('relative-birth-date').value;
@@ -98,7 +175,7 @@ document.getElementById('add-relative-form').addEventListener('submit', function
         console.error('Error adding relative:', error);
     });
     event.target.reset();
-    closeForm();
+    closeRelativeForm();
 });
 
 //called by init(), initializes the GoJS diagram

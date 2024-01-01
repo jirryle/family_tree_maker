@@ -25,7 +25,6 @@ def add_relative(node_id):
 
         # Call different functions based on relationship type
         if relationship == 'Father':
-            print("success")
             database.add_father(node_id, name, gender, birthDate, photoUrl)
         elif relationship == 'Mother':
             database.add_mother(node_id, name, gender, birthDate, photoUrl)
@@ -46,6 +45,11 @@ def add_relative(node_id):
 def get_family_trees():
     people = database.fetch_all_people()
     return jsonify([database.serialize_tree(person) for person in people])
+
+@app.route('/get_node_details/<nodeId>', methods=["GET"])
+def get_node_details(nodeId):
+    node_details = database.fetch_node_details(nodeId)
+    return jsonify(node_details)
 
 if __name__ == '__main__':
     database.setup()
