@@ -10,16 +10,53 @@ function init() {
 
     // Define a simple node template
     myDiagram.nodeTemplate =
-        $(go.Node, "Auto",  // Changed from "Spot" to "Auto" for automatic sizing
-            $(go.Shape, "Rectangle",  // This defines the node's outer shape
-                { fill: "lightblue", stroke: "gray", strokeWidth: 2 }),
-            $(go.TextBlock,  // This defines the text inside the node
+    $(go.Node, "Auto", // Node panel
+        { // Outer shape of the node
+            selectionObjectName: "PANEL",
+            resizable: false, resizeObjectName: "PANEL", // Don't allow users to resize nodes
+        },
+        $(go.Shape, "Rectangle", // Outer rectangular shape that encapusulates the vertical panel
+            { stroke: "gray", strokeWidth: 2}, new go.Binding("fill", "gender", function(gender) {
+                if (gender == "F") {
+                    return "pink";
+                } else if (gender == 'M') {
+                    return "lightblue";
+                } else {
+                    return "lightgray";
+                }
+            })),
+        $(go.Panel, "Vertical", // Vertically stacks the inner Picture and TextBlock objects
+            {name: "PANEL", margin: 10},
+            $(go.Picture,
                 {
-                    margin: 10, stroke: "black", font: "bold 14px sans-serif",
-                    alignment: go.Spot.Center  // Center the text in the node
+                    margin: 10,
+                    width: 50,
+                    height: 50,
+                    background: 'white',
+                    // Specify the errorFunction for handling image loading errors
+                    errorFunction: function(picture, error) {
+                        // If there's an error loading the image, set the source to the default kitten image
+                        picture.source = 'https://placekitten.com/50/50';
+                    }
                 },
-                new go.Binding("text", "name"))  // Bind the TextBlock to the node data's "name" property
-        );
+                new go.Binding("source", "photoUrl", function(url) { 
+                    // Return the URL or a default one if the URL is missing or empty
+                    return url || 'https://placekitten.com/50/50';
+                })
+            ),
+            $(go.TextBlock,
+                {
+                    margin: new go.Margin(5, 0),
+                    stroke: "black",
+                    font: "bold 11px sans-serif",
+                    textAlign: "center",
+                    wrap: go.TextBlock.WrapFit,
+                    maxSize: new go.Size(80, NaN)
+                },
+                new go.Binding("text", "name")
+            )            
+        ),
+    );
 
     // Define a simple link template
     myDiagram.linkTemplate =
