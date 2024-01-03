@@ -111,6 +111,43 @@ def add_mother(node_id, name, gender, birth_date, photo_url):
 
     return "Mother added successfully"
 
+def add_child(node_id, name, gender, birth_date, photo_url):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    try:
+        # Obtain the parent's gender (for mother_id/father_id)
+        cursor.execute('SELECT gender FROM relatives WHERE id = ?', (node_id))
+        parent_gender = cursor.fetchone()[0]
+
+        # Insert child node data into database
+        cursor.execute('''
+            INSERT INTO relatives (name, gender, birth_date, photo_url)
+            VALUES (?, ?, ?, ?)
+                       ''', (name, gender, birth_date, photo_url))
+        new_child_id = cursor.lastrowid
+
+        # Update child's mother_id/father_id
+        if parent_gender == 'Female':
+            cursor.execute('''
+                UPDATE relatives
+                SET mother_id = ?
+                WHERE id = ?
+                    ''', (node_id, new_child_id))
+        else:
+            cursor.execute('''
+                UPDATE relatives
+                SET father_id = ?
+                WHERE id = ?
+                    ''', (node_id, new_child_id))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+        return f"Failed to add child: {e}"
+    finally:
+        conn.close()
+    return "Child added successfully"
+        
+
 class Person:
     def __init__(self, id, name, gender, birth_date, photo_url, father_id=None, mother_id=None):
         self.id = id

@@ -17,9 +17,9 @@ function init() {
         },
         $(go.Shape, "Rectangle", // Outer rectangular shape that encapusulates the vertical panel
             { stroke: "gray", strokeWidth: 2}, new go.Binding("fill", "gender", function(gender) {
-                if (gender == "F") {
+                if (gender == "Female") {
                     return "pink";
-                } else if (gender == 'M') {
+                } else if (gender == 'Male') {
                     return "lightblue";
                 } else {
                     return "lightgray";
@@ -128,6 +128,8 @@ function showEditPersonForm() {
     form.style.display = 'block';
     const relativeForm = document.getElementById('add-relative-form');
     relativeForm.style.display = 'none';
+    // Set the nodeId in a hidden input so you know which node is being added to
+    document.getElementById('node-id').value = nodeId;
 }
 function resetToInstructions() {
     const nodeDetails = document.getElementById('node-details');
@@ -160,9 +162,26 @@ function showAddRelativeForm(nodeId) {
     document.getElementById('node-id').value = nodeId;
 }
 
-function setRelationship(relationship) {
+function setRelationship(relationship, button) {
+    // Remove the selected CSS class from all buttons and add to clicked button
+    var buttons = document.querySelectorAll('.relationship-button');
+    buttons.forEach(function(btn) {
+        btn.classList.remove('selected');
+    });
+    button.classList.add('selected');
     // Set the relationship when Parent or Child button is clicked
     document.getElementById('relationship').value = relationship;
+}
+
+function setGender(gender, button) {
+    // Remove the selected CSS class from all buttons and add to clicked button
+    var buttons = document.querySelectorAll('.gender-button');
+    buttons.forEach(function(btn) {
+        btn.classList.remove('selected');
+    });
+    button.classList.add('selected');
+    // Set the relationship when Parent or Child button is clicked
+    document.getElementById('relative-gender').value = gender;
 }
 
 function closeEditNodeForm() {
@@ -174,12 +193,29 @@ function closeRelativeForm() {
     document.getElementById('add-relative-form').style.display = 'none';
 }
 
+document.getElementById('edit-person-form').addEventListener('submit', function(submission){
+    submission.preventDefault();
+    const nodeId = document.getElementById('node-id').value;
+    const newName = document.getElementById('person-name').value;
+    const newGender = document.getElementById('person-gender').value;
+    const newBirthDate = document.getElementById('person-birth-date').value;
+    const newPhotoURL = document.getElementById('person-photo-url').value;
+
+    // Prepare form data
+    const formData = {
+        name: newName,
+        gender: newGender,
+        birth_date: newBirthDate,
+        photo_url: newPhotoURL
+    };
+
+    // Send data to server
+    fetch('/')
+})
 // Handle form submission
 document.getElementById('add-relative-form').addEventListener('submit', function(event) {
     event.preventDefault();
-
     const nodeId = document.getElementById('node-id').value;
-    console.log("nodeId for submit is ", nodeId);
     const name = document.getElementById('relative-name').value;
     const gender = document.getElementById('relative-gender').value;
     const birthDate = document.getElementById('relative-birth-date').value;

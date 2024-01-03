@@ -51,9 +51,9 @@
                     <input type="hidden" id="node-id">
                     <div>
                         <label>Relationship:</label>
-                        <button type="button" onclick="setRelationship('Father')">Father</button>
-                        <button type="button" onclick="setRelationship('Mother')">Mother</button>
-                        <button type="button" onclick="setRelationship('Child')">Child</button>
+                        <button type="button" class='relationship-button' onclick="setRelationship('Father', this)">Father</button>
+                        <button type="button" class='relationship-button' onclick="setRelationship('Mother', this)">Mother</button>
+                        <button type="button" class='relationship-button' onclick="setRelationship('Child', this)">Child</button>
                     </div>
                     <div>
                         <label>Name:</label>
@@ -61,7 +61,8 @@
                     </div>
                     <div>
                         <label>Gender:</label>
-                        <input type="text" id="relative-gender">
+                        <button type="button" class='gender-button' onclick="setGender('Male', this)">Male</button>
+                        <button type="button" class='gender-button' onclick="setGender('Female', this)">Female</button>
                     </div>
                     <div>
                         <label>Birth Date:</label>
@@ -72,6 +73,7 @@
                         <input type="text" id="relative-photo-url">
                     </div>
                     <input type="hidden" id="relationship">
+                    <input type="hidden" id="relative-gender">
                     <button type="submit">Add Relative</button>
                     <button type="button" onclick="closeRelativeForm()">Cancel</button>
                 </form>
