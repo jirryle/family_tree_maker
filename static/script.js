@@ -84,7 +84,6 @@ function fetchNodeDetails(nodeId) {
         method: 'GET',
     })
     .then (response => {
-        console.log(response);
         if (!response.ok) {
             throw new Error("Network response was not ok: ", response.statusText);
         }
@@ -123,7 +122,7 @@ function displayNodeDetails(nodeId, data) {
     }
 }
 
-function showEditPersonForm() {
+function showEditPersonForm(nodeId) {
     const form = document.getElementById('edit-person-form');
     form.style.display = 'block';
     const relativeForm = document.getElementById('add-relative-form');
@@ -208,9 +207,24 @@ document.getElementById('edit-person-form').addEventListener('submit', function(
         birth_date: newBirthDate,
         photo_url: newPhotoURL
     };
-
     // Send data to server
-    fetch('/')
+    fetch(`/edit_person/${nodeId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then (response => response.json())
+    .then(data => {
+        // Refresh the diagram to show the new person
+        fetchFamilyTreeData(myDiagram);
+    })
+    .catch(error => {
+        console.error('Error adding relative:', error);
+    });
+    event.target.reset();
+    closeRelativeForm();
 })
 // Handle form submission
 document.getElementById('add-relative-form').addEventListener('submit', function(event) {

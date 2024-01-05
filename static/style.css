@@ -11,6 +11,7 @@ body,html {
     flex: 1;
     background-color: #c8c9c4;
     box-sizing: border-box;
+    overflow-y:auto;
 }
 #node-details {
     text-align: center;
@@ -20,16 +21,11 @@ body,html {
     font-size: 20px;
     text-align: center;
 }
-#add-relative-form {
-    text-align: center;
-    font-size: 22px;
-    padding-top: 10px;
-}
-
+#add-relative-form,
 #edit-person-form {
     text-align: center;
     font-size: 22px;
-    padding-top: 30px;
+    padding: 10px;
 }
 
 #family-tree-container {

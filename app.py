@@ -51,6 +51,24 @@ def get_node_details(nodeId):
     node_details = database.fetch_node_details(nodeId)
     return jsonify(node_details)
 
+@app.route('/edit_person/<nodeId>', methods=['POST'])
+def edit_person(nodeId):
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing necessary data"}), 400
+    try:
+        # Extract data
+        name = data['name']
+        gender = data['gender']
+        birth_date = data['birth_date']
+        photo_url = data['photo_url']
+        database.edit_person(nodeId, name, gender, birth_date, photo_url)
+    except KeyError as e:
+        return jsonify({"error": f"Missing data: {e}"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    return jsonify({"message": "Person updated successfully"})
+
 if __name__ == '__main__':
     database.setup()
     app.run(debug=True)

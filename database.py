@@ -146,7 +146,23 @@ def add_child(node_id, name, gender, birth_date, photo_url):
     finally:
         conn.close()
     return "Child added successfully"
-        
+
+def edit_person(nodeId, name, gender, birth_date, photo_url):
+    conn = sqlite3.connect(DATABASE_NAME)
+    cursor = conn.cursor()
+    try:
+        cursor.execute('''
+            UPDATE relatives
+            SET name = ?, gender = ?, birth_date = ?, photo_url = ?
+            WHERE id = ?
+                       ''', (name, gender, birth_date, photo_url, nodeId))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"An error occured: {e}")
+        return f"Failed to update person: {e}"
+    finally:
+        conn.close()
+    return "Person updated successfully"
 
 class Person:
     def __init__(self, id, name, gender, birth_date, photo_url, father_id=None, mother_id=None):
