@@ -111,6 +111,7 @@ function displayNodeDetails(nodeId, data) {
             <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
             <p><strong>Gender:</strong> ${data.gender || 'N/A'}</p>
             <p><strong>Birth Date:</strong> ${data.birth_date || 'N/A'}</p>
+            <p><strong>Death Date:</strong> ${data.death_date || 'N/A'}</p>
             <p><strong>Photo URL:</strong> ${data.photo_url ? `<a href="${data.photo_url}" target="_blank">View Photo</a>` : 'N/A'}</p>
             <button onclick='showEditPersonForm("${nodeId}")'>Edit this person</button>
             <button onclick='showAddRelativeForm("${nodeId}")'>Add a relative</button>
@@ -198,6 +199,7 @@ document.getElementById('edit-person-form').addEventListener('submit', function(
     const newName = document.getElementById('person-name').value;
     const newGender = document.getElementById('person-gender').value;
     const newBirthDate = document.getElementById('person-birth-date').value;
+    const newDeathDate = document.getElementById('person-death-date').value;
     const newPhotoURL = document.getElementById('person-photo-url').value;
 
     // Prepare form data
@@ -205,6 +207,7 @@ document.getElementById('edit-person-form').addEventListener('submit', function(
         name: newName,
         gender: newGender,
         birth_date: newBirthDate,
+        death_date: newDeathDate,
         photo_url: newPhotoURL
     };
     // Send data to server
@@ -233,6 +236,7 @@ document.getElementById('add-relative-form').addEventListener('submit', function
     const name = document.getElementById('relative-name').value;
     const gender = document.getElementById('relative-gender').value;
     const birthDate = document.getElementById('relative-birth-date').value;
+    const deathDate = document.getElementById('relative-death-date').value;
     const photoUrl = document.getElementById('relative-photo-url').value;
     const relationship = document.getElementById('relationship').value;
 
@@ -241,6 +245,7 @@ document.getElementById('add-relative-form').addEventListener('submit', function
         name: name,
         gender: gender,
         birth_date: birthDate,
+        death_date: deathDate,
         photo_url: photoUrl,
         relationship: relationship,
     };
@@ -276,6 +281,7 @@ function fetchFamilyTreeData(myDiagram) {
                 name: node.name,
                 gender: node.gender,
                 birthDate: node.birth_date,
+                deathDate: node.death_date,
                 photoUrl: node.photo_url
             }));
 

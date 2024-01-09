@@ -20,16 +20,17 @@ def add_relative(node_id):
         name = data['name']
         gender = data['gender']
         birthDate = data['birth_date']
+        deathDate = data['death_date']
         photoUrl = data['photo_url']
         relationship = data['relationship']
 
         # Call different functions based on relationship type
         if relationship == 'Father':
-            database.add_father(node_id, name, gender, birthDate, photoUrl)
+            database.add_father(node_id, name, gender, birthDate, deathDate, photoUrl)
         elif relationship == 'Mother':
-            database.add_mother(node_id, name, gender, birthDate, photoUrl)
+            database.add_mother(node_id, name, gender, birthDate, deathDate, photoUrl)
         elif relationship == 'Child':
-            database.add_child(node_id, name, gender, birthDate, photoUrl)
+            database.add_child(node_id, name, gender, birthDate, deathDate, photoUrl)
         else:
             return jsonify({"error": "Invalid relationship type"}), 400
 
@@ -61,8 +62,9 @@ def edit_person(nodeId):
         name = data['name']
         gender = data['gender']
         birth_date = data['birth_date']
+        death_date = data['death_date']
         photo_url = data['photo_url']
-        database.edit_person(nodeId, name, gender, birth_date, photo_url)
+        database.edit_person(nodeId, name, gender, birth_date, death_date, photo_url)
     except KeyError as e:
         return jsonify({"error": f"Missing data: {e}"}), 400
     except Exception as e:
