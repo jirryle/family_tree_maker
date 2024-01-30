@@ -1,6 +1,5 @@
 import sqlite3
-from app import app
-from flask import app, jsonify
+from flask import jsonify
 
 DATABASE_NAME = "family_tree.db"
 
