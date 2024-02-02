@@ -1,0 +1,38 @@
+body,html {
+    height: 100%;
+    margin: 0;
+}
+#wrapper {
+    display: flex;
+    height: 100%;
+}
+
+#sidebar {
+    flex: 1;
+    background-color: #c8c9c4;
+    box-sizing: border-box;
+    overflow-y:auto;
+}
+#node-details {
+    text-align: center;
+    font-size: 25px;
+}
+#sidebar-header {
+    font-size: 20px;
+    text-align: center;
+}
+#add-relative-form,
+#edit-person-form {
+    text-align: center;
+    font-size: 22px;
+    padding: 10px;
+}
+
+#family-tree-container {
+    flex: 4;
+    border: 2px solid black;
+}
+.selected {
+    background-color: #483eda; /* Green background */
+    color: white; 
+}
