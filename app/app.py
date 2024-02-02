@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-import app.database as database
-
+from . import database
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -10,6 +9,7 @@ def create_app(test_config=None):
 
     # Register the routes with the app instance
     register_routes(app)
+    database.setup()
     return app
 
 def register_routes(app):
@@ -80,11 +80,7 @@ def register_routes(app):
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         return jsonify({"message": "Person updated successfully"})
-
-app = Flask(__name__)
-
+    
+app = create_app()
 if __name__ == '__main__':
-    app = create_app()
-    database.setup()
-    app.run(debug=True)
-
+    app.run()
