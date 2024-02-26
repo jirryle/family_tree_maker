@@ -7,7 +7,7 @@ import os
 def create_app(test_config=None):
     app = Flask(__name__)
 
-    database_uri = os.getenv('postgres://qbekrxfovbdgmd:d0abeacdf364d0d606d4ea5d22ef3f58eec3fd4076a787fafa0183e69cbddb00@ec2-52-54-200-216.compute-1.amazonaws.com:5432/dfrlurvkis1f6m')
+    database_uri = os.getenv('DATABASE_URL')
 
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri.replace("://", "ql://", 1)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
