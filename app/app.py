@@ -64,7 +64,7 @@ def register_routes(app):
     @app.route('/get_family_trees')
     def get_family_trees():
         people = database.fetch_all_people()
-        return jsonify([database.serialize_tree(person) for person in people])
+        return jsonify(people)
 
     @app.route('/get_node_details/<nodeId>', methods=["GET"])
     def get_node_details(nodeId):
