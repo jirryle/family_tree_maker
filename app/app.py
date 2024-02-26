@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from . import database
-from models import db
+from .models import db
 import os
 
 def create_app(test_config=None):

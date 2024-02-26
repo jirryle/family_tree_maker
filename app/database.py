@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
-from models import db, Relative
+from .models import db, Relative
 
 def insert_initial_data():
     if not Relative.query.first():  # Check if the table is empty
