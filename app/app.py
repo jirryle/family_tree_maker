@@ -1,16 +1,27 @@
 from flask import Flask, render_template, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 from . import database
+from models import db
+import os
 
 def create_app(test_config=None):
     app = Flask(__name__)
 
-    if test_config:
-        app.config.update(test_config)
+    database_uri = os.getenv('postgres://qbekrxfovbdgmd:d0abeacdf364d0d606d4ea5d22ef3f58eec3fd4076a787fafa0183e69cbddb00@ec2-52-54-200-216.compute-1.amazonaws.com:5432/dfrlurvkis1f6m')
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri.replace("://", "ql://", 1)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Initialize SQLAlchemy
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
+        database.insert_initial_data()
 
     # Register the routes with the app instance
     register_routes(app)
-    database.setup()
     return app
+
 
 def register_routes(app):
     @app.route('/')
@@ -20,8 +31,6 @@ def register_routes(app):
     @app.route('/add_relative/<node_id>', methods=['POST'])
     def add_relative(node_id):
         data = request.get_json()
-        print("data from app.route is ", data)
-        print("node id for child is ", node_id)
         if not data or 'relationship' not in data:
             return jsonify({"error": "Missing necessary data"}), 400
 
