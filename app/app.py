@@ -4,6 +4,7 @@ from . import database
 from .models import db
 import os
 
+# Create application
 def create_app(test_config=None):
     app = Flask(__name__)
 
