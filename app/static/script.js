@@ -36,12 +36,12 @@ function init() {
                     // Specify the errorFunction for handling image loading errors
                     errorFunction: function(picture, error) {
                         // If there's an error loading the image, set the source to the default kitten image
-                        picture.source = '../assets/pfp50.png';
+                        picture.source = 'https://picsum.photos/50';
                     }
                 },
                 new go.Binding("source", "photoUrl", function(url) { 
                     // Return the URL or a default one if the URL is missing or empty
-                    return url || '../assets/pfp50.png';
+                    return url || 'https://picsum.photos/50';
                 })
             ),
             $(go.TextBlock,
