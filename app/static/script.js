@@ -106,8 +106,8 @@ function displayNodeDetails(nodeId, data) {
     nodeDetails.innerHTML = "";
     if (data && Object.keys(data).length > 0) {
         const content = `
-            <img src="${data.photo_url || 'https://placekitten.com/200/300'}" style="max-width: 300px; max-height: 200px; width: auto;
-            height: auto;" onerror="this.onerror=null;this.src='https://placekitten.com/200/300';">
+            <img src="${data.photo_url || 'https://picsum.photos/200/300'}" style="max-width: 300px; max-height: 200px; width: auto;
+            height: auto;" onerror="this.onerror=null;this.src='https://picsum.photos/200/300';">
             <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
             <p><strong>Gender:</strong> ${data.gender || 'N/A'}</p>
             <p><strong>Birth Date:</strong> ${data.birth_date || 'N/A'}</p>
